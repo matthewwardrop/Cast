@@ -1,0 +1,73 @@
+html {
+	padding: 0px;
+	margin: 0px;
+}
+
+body {
+	margin: 0px;
+	padding: 0px;
+	background: #000;
+}
+
+#title {
+	background: #00F;
+}
+
+div {
+	overflow: hidden;
+}
+
+.iconview {
+	border-radius: 7px;
+	background: #000;
+	margin: 10px;
+	float: left;
+	width: 80px;
+	height: 80px;
+	padding: 4px;
+	position: relative;
+	-webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.9);
+	font-family: sans-serif;
+	border: 3px solid #ddd;
+	cursor: pointer;
+}
+
+.iconview span {
+	bottom: 0px;
+	display: block;
+	position: absolute;
+	text-align: center;
+	width: 80px;
+	color: #fff;
+	background: #000;
+	opacity: 0.6;
+	z-index: 1000;
+}
+
+.iconview img {
+	width: 80px;
+	height: 80px;
+	display: block;
+}
+
+.arrayview {
+	
+}
+
+.arrayview .sectiondiv {
+	background: #aaa;
+}
+
+.arrayview .spacer {
+	clear:both;
+	display: block;
+}
+
+.arrayview .sectiontitle {
+	display: block;
+	border-bottom: 2px #eee solid;
+}
+
+div.wrapper {
+	position: relative;
+}
