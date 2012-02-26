@@ -23,26 +23,26 @@ Cast.prototype.CONFIG.init = function() {
 	
 	this.parent.addEventListener(this.onResize,["resize"]);
 	this.parent.addEventListener(this.onReady,["render_complete"]);
-}
+};
 
 
-Cast.prototype.CONFIG.SCROLL_VIEWS = []
+Cast.prototype.CONFIG.SCROLL_VIEWS = [];
 Cast.prototype.CONFIG.onReady = function() {
 	for (var i in $CAST.CONFIG.SCROLL_VIEWS) {
 		var view = $CAST.CONFIG.SCROLL_VIEWS[i];
 		$(view).height($(view).parent().height());
 		new iScroll(view);
 	}
-}
+};
 
 Cast.prototype.CONFIG.onResize = function() {
 	$("#content").height($(window).height() - 200);
 	$CAST.notifyEvent("render_complete");
-}
+};
 
 Cast.prototype.CONFIG.DEFAULT_DISPLAY = {
 	title: 'No title specified',
-}
+};
 
 Cast.prototype.reLayout = function (cast,opts) {
 	if (opts.title == true) {
@@ -50,12 +50,12 @@ Cast.prototype.reLayout = function (cast,opts) {
 	} else {
 		$("#title").hide();
 	}
-}
+};
 
 Cast.prototype.CONFIG.RENDER_HANDLERS = {
 	"layout": Cast.prototype.reLayout,
 	"title": "title",
 	"content": "content"
-}
+};
 
 
