@@ -145,11 +145,12 @@
 		}
 	};
 
-	Cast.prototype.request = function (url,success,error) {
+	Cast.prototype.request = function (url,query,success,error) {
 		$.ajax({
 			async: true,
 			dataType: "jsonp",
 			url: url,
+			data: query,
 			timeout: 20000,
 			success: success,
 			error: error
@@ -251,12 +252,6 @@
 	 */
 	Cast.prototype.loadSheet = function(query,stack) {
 		var url = this.CONFIG.SERVER + this.CONFIG.SCRIPT;
-		if (query != undefined) {
-			url += "?";
-			for (q in query) {
-				url += q + "=" + query[q] + "&amp;";
-			}
-		}
 		
 		function success(data,a,b) {
 			$CAST.renderSheet(data,stack);
@@ -635,15 +630,8 @@
 			if (url == undefined || url == null) {
 				url = cast.CONFIG.SERVER + cast.CONFIG.SCRIPT;
 			}
-			var query = opts.query;
-			if (query != undefined && query != null) {
-				url += "?";
-				for (q in query) {
-					url += q + "=" + query[q] + "&amp;";
-				}
-			}
 			
-			return cast.request(url,success,error);
+			return cast.request(url,opts.query,success,error);
 		}
 		
 		/* Method 2: Generate from factory in config */
