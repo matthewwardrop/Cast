@@ -81,6 +81,9 @@
 	Cast.prototype.CONFIG.DEFAULT_DISPLAY = {};
 	Cast.prototype.CONFIG.RENDER_HANDLERS = {};
 	Cast.prototype.CONFIG.LOCAL_METHODS = {};
+	Cast.prototype.CONFIG.FACTORIES = {};
+	Cast.prototype.CONFIG.INIT_QUERY = null;
+	Cast.prototype.CONFIG.DEFAULT_FACTORY = null;
 
 	Cast.prototype.init = function() {
 		$(window).resize(function() {$CAST.notifyEvent("resize");});
@@ -90,7 +93,7 @@
 		this.addEventListener(this.render,["render"]);
 		/* Load configuration */
 		this.CONFIG.init();
-		this.loadSheet({'init':true});
+		this.loadSheet.apply(this,this.CONFIG.INIT_QUERY);
 		
 		this.notifyEvent("resize");
 	};
@@ -250,9 +253,7 @@
 	/*
 	 * Rendering functions
 	 */
-	Cast.prototype.loadSheet = function(query,stack) {
-		var url = this.CONFIG.SERVER + this.CONFIG.SCRIPT;
-		
+	Cast.prototype.loadSheet = function(type,opts,stack) {		
 		function success(data,a,b) {
 			$CAST.renderSheet(data,stack);
 		}
@@ -261,7 +262,7 @@
 			alert("cannot load sheet" + errorThrown);
 		}
 		
-		this.getSheet("url",{query:query},success,error);
+		this.getSheet(type,opts,success,error);
 	};
 
 	Cast.prototype.processInfo = function (sheetInfo) {
@@ -622,7 +623,7 @@
 	 * The methods here are the different "factories" to generate these formats.
 	 */
 
-	Cast.prototype.getSheet = function(method,opts,success,error) {
+	Cast.prototype.getSheet = function(type,opts,success,error) {
 		
 		/* Method 1: Download JSON file from server */
 		function UrlFactory (cast) {
@@ -630,18 +631,43 @@
 			if (url == undefined || url == null) {
 				url = cast.CONFIG.SERVER + cast.CONFIG.SCRIPT;
 			}
+			var query = opts.query;
+			if (query == null || query == undefined) {
+				query = opts;
+			}
 			
-			return cast.request(url,opts.query,success,error);
+			return cast.request(url,query,success,error);
 		}
 		
-		/* Method 2: Generate from factory in config */
-		// TODO
+		/* Method 2: Local JSON file */
+		function ScriptFactory (cast) {
+			var factory = opts.factory;
+			if (factory == undefined || factory == null) {
+				factory = cast.CONFIG.DEFAULT_FACTORY;
+			}
+			
+			factory = cast.CONFIG.FACTORIES[factory];
+			if (factory == undefined || factory == null) {
+				alert("no such factory " + opts.factory);
+			}
+			
+			try {
+				success(factory(opts));
+			} catch (e) {
+				alert("Cannot run factory: "+e); // TODO: USE error
+			}
+		}
 		
 		SUPPORTED_FACTORIES = {
-			"url": UrlFactory	
+			"url": UrlFactory,
+			"script": ScriptFactory
 		};
 		
-		SUPPORTED_FACTORIES[method](this);
+		if (type == null) {
+			type = "url";
+		}
+		
+		SUPPORTED_FACTORIES[type](this);
 	};
 	
 	
@@ -671,7 +697,7 @@
 		OpenSheet.prototype = new Action();
 		OpenSheet.prototype._run = function() {
 			this.cast.clearStack();
-			this.cast.loadSheet(this.opts.query,this.opts.stack);
+			this.cast.loadSheet(this.opts.type,this.opts.query,this.opts.stack);
 		};
 
 		var PushSheet = function(cast, opts) {
@@ -680,7 +706,7 @@
 		};
 		PushSheet.prototype = new Action();
 		PushSheet.prototype._run = function() {
-			this.cast.loadSheet(this.opts.query,this.opts.stack);
+			this.cast.loadSheet(this.opts.type,this.opts.query,this.opts.stack);
 		};
 
 		var PopSheet = function(cast, opts) {
