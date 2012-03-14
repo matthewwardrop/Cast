@@ -91,6 +91,8 @@
 		
 		this.addEventListener(this.onInteractHandler,["onInteract"]);
 		this.addEventListener(this.render,["render"]);
+		window.addEventListener("hashchange", this.popStackTo, false);
+		
 		/* Load configuration */
 		this.CONFIG.init();
 		this.loadSheet.apply(this,this.CONFIG.INIT_QUERY);
@@ -170,6 +172,9 @@
 		} else {
 			this.STACKS[stack].push(sheetInfo);
 		}
+		if (this.STACKS[stack].length > 1) {
+			window.location.hash = this.STACKS[stack].length;
+		}
 	};
 
 	Cast.prototype.clearStack = function (stack) {
@@ -189,7 +194,23 @@
 		for (var i=0; i<count; i++) {
 			this.STACKS[stack].pop();
 		}
+		target = window.location.hash;
+		if (target == "") {
+			target = "#1";
+		}
+		if (this.STACKS[stack].length < target.replace("#","")) {
+			window.history.back(this.STACKS[stack].length - target.replace("#",""));
+		}
 		this.notifyEvent("render");
+	};
+	
+	Cast.prototype.popStackTo = function () {
+		stack = $CAST.CURRENT_STACK;
+		target = window.location.hash;
+		if (target == "") {
+			target = "#1";
+		}
+		$CAST.popStack(stack,$CAST.STACKS[stack].length-target.replace("#",""));
 	};
 
 	Cast.prototype.getCurrentStack = function () {
@@ -262,6 +283,7 @@
 			alert("cannot load sheet" + errorThrown);
 		}
 		
+		this.notifyEvent("loading","start");
 		this.getSheet(type,opts,success,error);
 	};
 
@@ -359,6 +381,7 @@
 			}
 		}
 		$CAST.notifyEvent("render_complete");
+		$CAST.notifyEvent("loading","end");
 	};
 	
 	/* Views */
@@ -589,7 +612,7 @@
 				}
 				stackList.push(["template",{"z_index":currentStack.length - i,"li_class":classname,"class":classname,"onclick":["pop",{"count":currentStack.length-i-1}],"template":"titles","fields":{ "title": currentStack[i].title }}]);
 			}
-			return new ListView(this.cast,{"class":"stackview", "list":stackList,"scroll":{vScroll:false,hScrollbar:false},"templates":{"titles":"<span>%(title)s</span>"}}).render();
+			return new ListView(this.cast,{"class":"stackview", "list":stackList,"scroll":{vScroll:false,hScrollbar:false,scrollMaxRight:true},"templates":{"titles":"<span>%(title)s</span>"}}).render();
 		};
 		
 		SUPPORTED_VIEWS = {
