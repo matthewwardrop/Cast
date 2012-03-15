@@ -1,0 +1,79 @@
+Factory API
+------------
+UrlFactory
+ - url
+ - query : dict of key and values
+
+ScriptFactory
+ - factory : identifier of factory script (as defined in local config)
+ - * : Any other arguments you want to handle in your own script
+
+Actions API
+------------
+OpenSheet (clear stack)
+ - type
+ - query
+ - stack
+
+PushSheet (append to stack)
+ - type
+ - query
+ - stack
+
+PopSheet
+ - count
+
+PrefSave
+ - key
+ - value
+
+PrefSaveInput(domObject)
+ - key
+
+LocalMethod
+ - TO BE DONE
+
+Views API
+----------
+
+BaseView (all views inherit these fields)
+ - class : CSS class to use instead of default class
+ - z_index : CSS z_index
+ - onclick : See actions API
+ - onchange : See actions API
+ - scroll : See iscroll API
+
+TextView
+ - Text views do not have a "text" attribute persay. Just send a regular string and it will be rendered by the TextView
+ - Note: text sent here will have the HTML escaped.
+
+ListView
+ - list : an array of nested views or text (which will be rendered by TextView)
+ - templates : a dictionary of templates. Fields should be identified by: %(<fieldname>)s
+
+TemplateView [For use with ListView only]
+ - template : id of template to use
+ - fields : Dictionary of fields to substitute values
+ 
+ImageView
+ - src : Source of image
+
+IconView
+ - icon : Image to show
+ - label : Text to be associated with icon
+
+ArrayView
+ - array : dictionary of lists of views. Keys will be the sections. The "" section does not have a section header
+
+EditText
+ - value : initial value
+
+EditSelect
+ - options : dictionary of options and their corresponding values
+ - value : initially selected option
+
+WebView
+ - html : html to be shown in the webview
+
+StackView
+ - Stackview does not take any arguments except for those shared by all views. This is because the StackView is automatically generated to show the current stack.

@@ -131,7 +131,7 @@ Cast.prototype.getView = function (viewInfo) {
 		var container = document.createElement("div");
 		var labelSpan = document.createElement("span");
 		labelSpan.appendChild(document.createTextNode(this.cast.processText(this.opts.label)));
-		var icon = new ImageView(this.cast,{src:"test.png"}).render();
+		var icon = new ImageView(this.cast,{src:this.opts.icon}).render();
 		container.appendChild(icon);
 		container.appendChild(labelSpan);
 		return container;
