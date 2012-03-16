@@ -1,10 +1,19 @@
 /* RENDER */
+
+/*
+ * Rendering config options
+ */
+Cast.prototype.CONFIG.DEFAULT_DISPLAY = {};
+Cast.prototype.CONFIG.RENDER_HANDLERS = {};
+Cast.prototype.CONFIG.SCROLL_VIEWS = []; // TODO: Move from config
+
 /*
  * Rendering functions
  */
-Cast.prototype.loadSheet = function(type,opts,stack) {		
+Cast.prototype.loadSheet = function(type,opts,stack) {
+	var that = this;
 	function success(data,a,b) {
-		$CAST.renderSheet(data,stack);
+		that.renderSheet(data,stack);
 	}
 	
 	function error(jqXHR, textStatus, errorThrown) {
@@ -46,7 +55,7 @@ Cast.prototype.getCSSList = function () {
 Cast.prototype.castDirectiveHandler = function (field,info) {
 	if (field == "cast_css_add") {
 		$(info).each(function() {
-			if ($.inArray(this,$CAST.getCSSList())==-1) {
+			if ($.inArray(this,this.getCSSList())==-1) {
 				$("head").append("<link>");
 				css = $("head").children(":last");
 				css.attr({
@@ -58,7 +67,7 @@ Cast.prototype.castDirectiveHandler = function (field,info) {
 		});
     } else if (field == "cast_css_remove") {
     	$(info).each(function() {
-			if ($.inArray(this,$CAST.getCSSList())>-1) {
+			if ($.inArray(this,this.getCSSList())>-1) {
 				$("head > link[href='"+this+"']").remove();
 			}
     	});
@@ -72,9 +81,9 @@ Cast.prototype.renderSheet = function (sheetInfo,stack) {
 
 Cast.prototype.render = function () {
 	
-	sheetInfo = $CAST.getCurrentSheet();
+	sheetInfo = this.getCurrentSheet();
 	
-	sheetInfo = $CAST.processInfo(sheetInfo);
+	sheetInfo = this.processInfo(sheetInfo);
 	
 	order = [];
 	if ("cast_order" in sheetInfo) {
@@ -91,23 +100,23 @@ Cast.prototype.render = function () {
 	
 	for (field in sheetInfo) {
 		if (field.startsWith("cast_")) {
-			$CAST.castDirectiveHandler(field, sheetInfo[field]);
+			this.castDirectiveHandler(field, sheetInfo[field]);
 			continue;
 		}
-		if (field in $CAST.CONFIG.RENDER_HANDLERS) {
-			var handler = $CAST.CONFIG.RENDER_HANDLERS[field];
+		if (field in this.CONFIG.RENDER_HANDLERS) {
+			var handler = this.CONFIG.RENDER_HANDLERS[field];
 			if (handler instanceof Function) {
-				$CAST.CONFIG.RENDER_HANDLERS[field]($CAST,sheetInfo[field]);
+				this.CONFIG.RENDER_HANDLERS[field](this,sheetInfo[field]);
 			} else if (isDOMElement(handler)) {
-				$CAST.defaultRenderHandler(handler,sheetInfo[field]);
+				this.defaultRenderHandler(handler,sheetInfo[field]);
 			} else if (typeof handler == "string") {
 				element = document.getElementById(handler);
 				if (element != null) {
-					$CAST.defaultRenderHandler(element,sheetInfo[field]);
+					this.defaultRenderHandler(element,sheetInfo[field]);
 				}
 			}
 		}
 	}
-	$CAST.notifyEvent("render_complete");
-	$CAST.notifyEvent("loading","end");
+	this.notifyEvent("render_complete");
+	this.notifyEvent("loading","end");
 };

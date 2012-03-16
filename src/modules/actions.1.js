@@ -23,6 +23,7 @@ Cast.prototype.action = function(actionInfo) {
 	OpenSheet.prototype = new Action();
 	OpenSheet.prototype._run = function() {
 		this.cast.clearStack();
+		console.log(this.cast);
 		this.cast.loadSheet(this.opts.type,this.opts.query,this.opts.stack);
 	};
 

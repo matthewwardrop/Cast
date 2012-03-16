@@ -19,14 +19,14 @@ Cast.prototype.getViewPrototype = function() {
 		if (isDOMElement(obj) && this.opts.onclick != undefined && this.opts.onclick != null) {
 			var onClickID = keys(this.cast.INTERACTION_HANDLERS).length + 1;
 			this.cast.INTERACTION_HANDLERS[onClickID] = this.getOnClick(this.opts.onclick);
-			obj.setAttribute("onclick","$CAST.notifyEvent('onInteract',"+onClickID+",this);");
+			obj.setAttribute("onclick",this.cast.varname+".notifyEvent('onInteract',"+onClickID+",this);");
 			$(obj).css("cursor","pointer");
 		}
 		
 		if (isDOMElement(obj) && (obj.tagName == "INPUT" || obj.tagName == "SELECT") && this.opts.onchange != undefined && this.opts.onchange != null) {
 			var onChangeID = keys(this.cast.INTERACTION_HANDLERS).length + 1;
 			this.cast.INTERACTION_HANDLERS[onChangeID] = this.getOnClick(this.opts.onchange);
-			obj.setAttribute("onchange","$CAST.notifyEvent('onInteract',"+onChangeID+",this);");
+			obj.setAttribute("onchange",this.cast.varname+".notifyEvent('onInteract',"+onChangeID+",this);");
 		}
 		
 		if (this.opts.scroll != undefined) {

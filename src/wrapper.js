@@ -11,10 +11,5 @@
 	
 //%CAST_SCRIPTS
 	
-	window['CastProto'] = Cast;
+	window['Cast'] = Cast;
 })(window);
-
-function Cast(varname,config_file) {
-	window[varname] = new CastProto(varname,config_file);
-	return window[varname];
-}

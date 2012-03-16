@@ -1,6 +1,14 @@
 /* Cast Core */
+
+/**
+ * The Cast prototype class.
+ * @name Cast
+ * @constructor
+ * @param varname
+ * @param config_file
+ */
 function Cast (varname, config_file) { //TODO: Import configuration from non cast_config url.
-	$CAST = this;
+	var that = this;
 	this.varname = varname;
 	this.STACKS = {};
 	this.CURRENT_STACK = "default";
@@ -11,29 +19,62 @@ function Cast (varname, config_file) { //TODO: Import configuration from non cas
 		alert('Config File not specified!');
 		return;
 	}
-	this.load_components([[config_file,"cast"],"iscroll"], function(data, textStatus, jqXHR) {$CAST.init();});
+	this.load_components([[config_file,"cast"],"iscroll"], function(data, textStatus, jqXHR) {that.init();});
 };
 
-/* Initialise required configuration options */
+/**
+ * Get an instance of Cast.
+ * @name getInstance
+ * @memberOf Cast
+ * @function
+ * @param {String} varname Global variable to be used as a reference to this instance.
+ * @param {String} config_file URI to the cast configuration file for this instance.
+ * @returns {Cast} The new cast instance.
+ */
+Cast.getInstance = function (varname,config_file) {
+	window[varname] = new Cast(varname,config_file);
+	return window[varname];
+};
+
+/**
+ * Wrap the function so that when it is called from a non-Cast object, it still
+ * correctly references the right Cast instance.
+ * @name wrap
+ * @function
+ * @memberOf Cast#
+ * @param {Function} func The function which is to be called outside of Cast.
+ * @returns {Function} The wrapped function
+ */
+Cast.prototype.wrap = function (func) {
+	var varname = this.varname;
+	return function () {
+		window[varname][func].apply(window[varname],arguments);
+	};
+};
+
+/* Initialise required configuration options for core module [other modules can add to this] */
 Cast.prototype.CONFIG = new Object();
 Cast.prototype.CONFIG.SERVER = null;
 Cast.prototype.CONFIG.SCRIPT = null;
 Cast.prototype.CONFIG.init = null;
-Cast.prototype.CONFIG.SCROLL_VIEWS = []; // TODO: Move from config
-Cast.prototype.CONFIG.DEFAULT_DISPLAY = {};
-Cast.prototype.CONFIG.RENDER_HANDLERS = {};
-Cast.prototype.CONFIG.LOCAL_METHODS = {};
-Cast.prototype.CONFIG.FACTORIES = {};
 Cast.prototype.CONFIG.INIT_QUERY = null;
-Cast.prototype.CONFIG.DEFAULT_FACTORY = null;
+Cast.prototype.CONFIG.LOCAL_METHODS = {}; // For processing text
 
+/**
+ * The purpose of this function is to edit edit keyboard input to determine if
+ * the keystrokes are valid.
+ * @name init
+ * @function
+ * @memberOf Cast#
+ */
 Cast.prototype.init = function() {
-	$(window).resize(function() {$CAST.notifyEvent("resize");});
-	$(document).ready(function() {$CAST.notifyEvent("ready");});
+	var that = this;
+	$(window).resize(function() {that.notifyEvent("resize");});
+	$(document).ready(function() {that.notifyEvent("ready");});
 	
 	this.addEventListener(this.onInteractHandler,["onInteract"]);
 	this.addEventListener(this.render,["render"]);
-	window.addEventListener("hashchange", this.popStackTo, false);
+	window.addEventListener("hashchange", this.wrap('popStackTo'), false);
 	
 	/* Load configuration */
 	this.CONFIG.init();
@@ -42,12 +83,27 @@ Cast.prototype.init = function() {
 	this.notifyEvent("resize");
 };
 
+/**
+* Get the uri of this script (as tagged in the HTML).
+* @name get_cast_uri
+* @memberOf Cast#
+* @function
+* @returns The uri of the cast folder.
+*/
 Cast.prototype.get_cast_uri = function () {
 	var path = document.getElementById("cast").src;
 	path = path.substring(0, Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\\\"))); 
 	return path;
 };
 
+/**
+ * Load asynchronously the other components required by cast.
+ * @name load_components
+ * @memberOf Cast#
+ * @function
+ * @param components
+ * @param onLoaded
+ */
 Cast.prototype.load_components = function (components,onLoaded) {
 	var completed = 0;
 	
@@ -92,6 +148,16 @@ Cast.prototype.load_components = function (components,onLoaded) {
 	}
 };
 
+/**
+ * Request a JSON data set from a specified url with a specified query. Light wrapper around JSON ajax request.
+ * @name request
+ * @function
+ * @memberOf Cast#
+ * @param {String} url Url to request
+ * @param {Object} query Query key-value pairs
+ * @param {Function} success Function to call upon success
+ * @param {FunctiON} error Function to call upon error
+ */
 Cast.prototype.request = function (url,query,success,error) {
 	$.ajax({
 		async: true,
@@ -147,12 +213,12 @@ Cast.prototype.popStack = function (stack,count) {
 };
 
 Cast.prototype.popStackTo = function () {
-	stack = $CAST.CURRENT_STACK;
+	stack = this.CURRENT_STACK;
 	target = window.location.hash;
 	if (target == "") {
 		target = "#1";
 	}
-	$CAST.popStack(stack,$CAST.STACKS[stack].length-target.replace("#",""));
+	this.popStack(stack,this.STACKS[stack].length-target.replace("#",""));
 };
 
 Cast.prototype.getCurrentStack = function () {
@@ -205,7 +271,7 @@ Cast.prototype.notifyEvent = function (event) {
 };
 
 Cast.prototype.onInteractHandler = function(id,domObject) {
-	var handler = $CAST.INTERACTION_HANDLERS[id];
+	var handler = this.INTERACTION_HANDLERS[id];
 	if (handler != null) {
 		handler.run(domObject);
 	}

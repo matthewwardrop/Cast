@@ -1,4 +1,8 @@
 /* Factory */
+
+Cast.prototype.CONFIG.DEFAULT_FACTORY = null;
+Cast.prototype.CONFIG.FACTORIES = {};
+
 /*
  * Cast depends upon receiving JSON parsed in compliance with the Cast protocol.
  * The methods here are the different "factories" to generate these formats.
