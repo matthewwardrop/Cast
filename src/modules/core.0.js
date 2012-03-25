@@ -13,7 +13,6 @@ function Cast (varname, config_file) { //TODO: Import configuration from non cas
 	this.STACKS = {};
 	this.CURRENT_STACK = "default";
 	this.EVENT_LISTENERS = {};
-	this.INTERACTION_HANDLERS = {};
 	this.CONFIG.parent = this;
 	if (config_file === undefined) {
 		alert('Config File not specified!');
@@ -52,6 +51,9 @@ Cast.prototype.wrap = function (func) {
 	};
 };
 
+/* Initialise internal module initialisers */
+Cast.prototype.MODULE_INITS = new Object();
+
 /* Initialise required configuration options for core module [other modules can add to this] */
 Cast.prototype.CONFIG = new Object();
 Cast.prototype.CONFIG.SERVER = null;
@@ -69,7 +71,13 @@ Cast.prototype.CONFIG.LOCAL_METHODS = {}; // For processing text
  */
 Cast.prototype.init = function() {
 	var that = this;
-	$(window).resize(function() {that.notifyEvent("resize");});
+	
+	/* Initialise any modules that need initialising */
+	for (var init_name in this.MODULE_INITS) {
+		this.MODULE_INITS[init_name].apply(this);
+	}
+	
+	$(window).resize(function() {that.notifyEvent("resize");}); // TODO: BE CONSISTENT Use window.addEventListener...
 	$(document).ready(function() {that.notifyEvent("ready");});
 	
 	this.addEventListener(this.onInteractHandler,["onInteract"]);
@@ -267,12 +275,5 @@ Cast.prototype.notifyEvent = function (event) {
 	info = args.slice(1);
 	for (var i in this.EVENT_LISTENERS[event]) {
 		this.EVENT_LISTENERS[event][i].apply(this,info);
-	}
-};
-
-Cast.prototype.onInteractHandler = function(id,domObject) {
-	var handler = this.INTERACTION_HANDLERS[id];
-	if (handler != null) {
-		handler.run(domObject);
 	}
 };

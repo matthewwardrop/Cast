@@ -1,13 +1,23 @@
 /* Factory */
 
-Cast.prototype.CONFIG.DEFAULT_FACTORY = null;
-Cast.prototype.CONFIG.FACTORIES = {};
+Cast.prototype.CONFIG.DEFAULT_FACTORY = null; //TODO: USE THIS
+Cast.prototype.CONFIG.FACTORIES = {}; // TODO: USE THIS
 
 /*
  * Cast depends upon receiving JSON parsed in compliance with the Cast protocol.
  * The methods here are the different "factories" to generate these formats.
  */
 
+/**
+ * Get a sheet in the Cast protocol format.
+ * @name getSheet
+ * @memberOf Cast#
+ * @function
+ * @param {String} type The type of factory to use to generate the sheet.
+ * @param {Object} opts A diction of options to pass to the relevant factory.
+ * @param {Function} success A callback function to receive the sheet information if successful.
+ * @param {Function} error A callback function to receive the sheet information if unsuccessful.
+ */
 Cast.prototype.getSheet = function(type,opts,success,error) {
 	
 	/* Method 1: Download JSON file from server */

@@ -5,7 +5,20 @@
  */
 Cast.prototype.CONFIG.DEFAULT_DISPLAY = {};
 Cast.prototype.CONFIG.RENDER_HANDLERS = {};
-Cast.prototype.CONFIG.SCROLL_VIEWS = []; // TODO: Move from config
+Cast.prototype.CURRENT_VIEWS = [];
+Cast.prototype.INTERACTION_HANDLERS = {};
+
+Cast.prototype.MODULE_INITS.render = function () {
+	// Notify views when they are ready to be interacted with.
+	this.addEventListener(
+			function() {
+				for (var i=0; i<this.CURRENT_VIEWS.length; i++) {
+					this.CURRENT_VIEWS[i].onReady();
+				}
+			},
+			["render_complete"]
+		);
+};
 
 /*
  * Rendering functions
@@ -80,6 +93,8 @@ Cast.prototype.renderSheet = function (sheetInfo,stack) {
 };
 
 Cast.prototype.render = function () {
+	this.CURRENT_VIEWS = [];
+	this.INTERACTION_HANDLERS = {};
 	
 	sheetInfo = this.getCurrentSheet();
 	
@@ -119,4 +134,11 @@ Cast.prototype.render = function () {
 	}
 	this.notifyEvent("render_complete");
 	this.notifyEvent("loading","end");
+};
+
+Cast.prototype.onInteractHandler = function(id,domObject) {
+	var handler = this.INTERACTION_HANDLERS[id];
+	if (handler != null) {
+		handler.run(domObject);
+	}
 };

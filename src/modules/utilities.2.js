@@ -1,6 +1,12 @@
 /* Cast utilities */
-	
-//Returns true if it is a DOM node
+
+/**
+ * Checks if an object is a DOM node.
+ * @name isDOMNode
+ * @function
+ * @param {Object} o Object to be checked
+ * @returns {Boolean} True if object is DOM node, False otherwise.
+ */
 function isDOMNode(o){
   return (
     typeof Node === "object" ? o instanceof Node : 
@@ -8,7 +14,13 @@ function isDOMNode(o){
   );
 }
 
-//Returns true if it is a DOM element    
+/**
+ * Checks if an object is a DOM element.
+ * @name isDOMElement
+ * @function
+ * @param {Object} o Object to be checked
+ * @returns {Boolean} True if object is DOM element, False otherwise.
+ */
 function isDOMElement(o){
   return (
     typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
@@ -17,7 +29,7 @@ function isDOMElement(o){
 }
 
 
-// Add startswith element onto strings
+// Add startsWith method onto strings
 if (typeof String.prototype.startsWith != 'function') {
   String.prototype.startsWith = function (str) {
     return this.indexOf(str) == 0;
